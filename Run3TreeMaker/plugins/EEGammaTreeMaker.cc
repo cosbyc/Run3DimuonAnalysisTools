@@ -376,11 +376,10 @@ void EEGammaTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       for ( unsigned int iElectron = 0; iElectron < electronsH->size(); iElectron++ ) {
         if ( (electronsH->at(iElectron)).pt() > kMinElectronPt ) {
           for ( unsigned int jElectron = iElectron+1; jElectron < electronsH->size(); jElectron++ ) {
-	   if ( (!electronsH->at(jElectron).gsfTrack().isNull()) && (!electronsH->at(iElectron).gsfTrack().isNull())) {
-	    if ( (electronsH->at(jElectron)).pt() > kMinElectronPt && ( (electronsH->at(iElectron)).charge() * (electronsH->at(jElectron)).charge() < 0 ) ) {
-
+	          if ( (!electronsH->at(jElectron).gsfTrack().isNull()) && (!electronsH->at(iElectron).gsfTrack().isNull())) {
+	            if ( (electronsH->at(jElectron)).pt() > kMinElectronPt && ( (electronsH->at(iElectron)).charge() * (electronsH->at(jElectron)).charge() < 0 ) ) {
               reco::Track part_1 = *((electronsH->at(iElectron)).gsfTrack());
-	      reco::Track part_2 = *((electronsH->at(jElectron)).gsfTrack());
+	            reco::Track part_2 = *((electronsH->at(jElectron)).gsfTrack());
               vector<reco::TransientTrack> transient_tracks{};
               transient_tracks.push_back(theB->build(&part_1));
               transient_tracks.push_back(theB->build(&part_2));
@@ -407,10 +406,10 @@ void EEGammaTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& 
                   e_idx[!iElectronIsPositive] = jElectron; // if iElectron is negative/positive, jElectron is positive/negative, save jElectron to e_idx[1]/e_idx[0]
                 }
               }
-	   }
-	  }
-          }
+	          }
+	        }
         }
+      }
     }      
       
       //if (bestProbVtx > kMinVtxProb) { // will fill tree if true
