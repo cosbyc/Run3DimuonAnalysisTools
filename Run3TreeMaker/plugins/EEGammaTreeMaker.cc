@@ -170,7 +170,7 @@ private:
   // electron variables
   ROOT::Math::PtEtaPhiMVector e_v[2];
   std::vector<bool> e_ID[2];
-  int   e_idx[2]; // let standard be 0 = e-, 1 = e+
+  size_t   e_idx[2]; // let standard be 0 = e-, 1 = e+
   float e_pfIso[2];
   float e_pt[2];
   float e_eta[2];
@@ -376,11 +376,11 @@ void EEGammaTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       for ( unsigned int iElectron = 0; iElectron < electronsH->size(); iElectron++ ) {
         if ( (electronsH->at(iElectron)).pt() > kMinElectronPt ) {
           for ( unsigned int jElectron = iElectron+1; jElectron < electronsH->size(); jElectron++ ) {
-	   if ( (!electronsH->at(jElectron).track().isNull()) && (!electronsH->at(iElectron).track().isNull())) {
+	   if ( (!electronsH->at(jElectron).gsfTrack().isNull()) && (!electronsH->at(iElectron).gsfTrack().isNull())) {
 	    if ( (electronsH->at(jElectron)).pt() > kMinElectronPt && ( (electronsH->at(iElectron)).charge() * (electronsH->at(jElectron)).charge() < 0 ) ) {
 
-              reco::Track part_1 = *((electronsH->at(iElectron)).track());
-	      reco::Track part_2 = *((electronsH->at(jElectron)).track());
+              reco::Track part_1 = *((electronsH->at(iElectron)).gsfTrack());
+	      reco::Track part_2 = *((electronsH->at(jElectron)).gsfTrack());
               vector<reco::TransientTrack> transient_tracks{};
               transient_tracks.push_back(theB->build(&part_1));
               transient_tracks.push_back(theB->build(&part_2));
@@ -413,10 +413,11 @@ void EEGammaTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& 
         }
     }      
       
-      if (bestProbVtx > kMinVtxProb) { // will fill tree if true
+      //if (bestProbVtx > kMinVtxProb) { // will fill tree if true
+      if (true) { // will fill tree if true
         //std::cout<< "fill tree"<<std::endl;
         fillTree = true;
-        vtx_prob = bestProbVtx;
+        /*vtx_prob = bestProbVtx;
         vtx_chi2 = vertex.normalizedChi2();
         vtx_pos[0] = vertex.x();
         vtx_pos[1] = vertex.y();
@@ -428,12 +429,13 @@ void EEGammaTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& 
         pv_pos[0] = pv.x();
         pv_pos[1] = pv.y();
         pv_pos[2] = pv.z();
-
+	*/
         eventNum = iEvent.id().event();
         lumiSec = iEvent.luminosityBlock();
         runNum = iEvent.id().run();
 
         for ( int i : {0, 1} ) {
+	  if ( e_idx[i] < electronsH->size() ) continue;
           auto iE = electronsH->at(e_idx[i]);
 
           e_pt[i] = iE.pt();
@@ -537,7 +539,7 @@ void EEGammaTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     }
   }
 
-  bool fillGenTree = false;
+  bool fillGenTree = true;
   if ( doFullGEN or ( doGEN and fillTree ) ) {
 
     gen_motherID.clear();
@@ -767,12 +769,12 @@ void EEGammaTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       e_trkChi2[ii] = -1;
       e_trkNdof[ii] = -1;
     }
-    vtx_prob = -1;
+    /*vtx_prob = -1;
     vtx_pos[0] = -1; vtx_pos[1] = -1; vtx_pos[2] = -1;
     vtx_posError[0] = -1; vtx_posError[1] = -1; vtx_posError[2] = -1;
     vtx_chi2 = -1;
     npv = -1;
-    pv_pos[0] = -1; pv_pos[1] = -1; pv_pos[2] = -1;
+    pv_pos[0] = -1; pv_pos[1] = -1; pv_pos[2] = -1;*/
 
     e_ID[0].clear();
     e_ID[1].clear();
@@ -837,7 +839,7 @@ void EEGammaTreeMaker::beginJob() {
     tree->Branch("e2_trkNdof"          , &e_trkNdof[1]                  , "e2_trkNdof/F"  );
 
     //tree->Branch("rho"                 , &rho                         , "rho/F"     );
-
+    /*
     tree->Branch("probVtx"            , &vtx_prob                      , "probVtx/F"  );
     tree->Branch("vtxX"               , &vtx_pos[0]                         , "vtxX/F"  );
     tree->Branch("vtxY"               , &vtx_pos[1]                          , "vtxY/F"  );
@@ -851,7 +853,7 @@ void EEGammaTreeMaker::beginJob() {
     tree->Branch("pvX"                , &pv_pos[0]                          , "pvX/F"  );
     tree->Branch("pvY"                , &pv_pos[1]                          , "pvY/F"  );
     tree->Branch("pvZ"                , &pv_pos[2]                          , "pvZ/F"  );
-
+    */
     tree->Branch("e1_ID", "std::vector<bool>", &e_ID[0], 32000, 0);
     tree->Branch("e2_ID", "std::vector<bool>", &e_ID[1], 32000, 0);
 
